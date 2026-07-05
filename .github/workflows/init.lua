@@ -1,33 +1,23 @@
-local MAIN_URL = "https://raw.githubusercontent.com/nutel4a/CWLight/refs/heads/main/.github/workflows/CycleWareLight.lua"
-local ADAPTIVE_URL = "https://raw.githubusercontent.com/nutel4a/CWLight/refs/heads/main/.github/workflows/CycleWareLightAdaptive.lua"
+local MAIN = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/nutel4a/CWLight/refs/heads/main/.github/workflows/CycleWareLight.lua", true))()'
+local ADAPT = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/nutel4a/CWLight/refs/heads/main/.github/workflows/CycleWareLightAdaptive.lua", true))()'
 
-local OVERRIDES = { Xeno = "adaptive", MacSploit = "main", Real = "main" }
+local e = (identifyexecutor or getexecutorname or function() end)()
 
-local function exists(name)
-	local ok, fn = pcall(function() return _G[name] or getfenv()[name] end)
-	return ok and typeof(fn) == "function"
+for _,v in ipairs{
+	getgenv,gethui,readfile,writefile,isfile,listfiles,
+	newcclosure,checkcaller,keytap,keystroke,firesignal
+} do
+	if type(v) ~= "function" then
+		return print("not supported.")
+	end
 end
 
-local function getExecutorName()
-	local ok, name = pcall(function()
-		return (identifyexecutor or getexecutorname or function() end)()
-	end)
-	return ok and name or nil
-end
+local s = ({
+	Xeno = ADAPT,
+	MacSploit = MAIN,
+	Real = MAIN
+})[e] or ((hookmetamethod and getnamecallmethod) and MAIN or ADAPT)
 
-local build = OVERRIDES[getExecutorName()]
-if not build then
-	build = (exists("hookmetamethod") and exists("getnamecallmethod")) and "main" or "adaptive"
-end
-
-local url = build == "main" and MAIN_URL or ADAPTIVE_URL
-
-local ok = pcall(function()
-	return (loadstring or load)(game:HttpGet(url, true))()
-end)
-
-if not ok and build == "main" then
-	pcall(function()
-		return (loadstring or load)(game:HttpGet(ADAPTIVE_URL, true))()
-	end)
+if not pcall(loadstring(s)) and s == MAIN then
+	pcall(loadstring(ADAPT))
 end
