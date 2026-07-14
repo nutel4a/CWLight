@@ -4,9 +4,10 @@ local ADAPT = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/nutel4
 local e = (identifyexecutor or getexecutorname or function() end)()
 
 for _,v in ipairs{
-	getgenv,gethui,readfile,writefile,isfile,listfiles,
-	newcclosure,checkcaller,keytap,keystroke,firesignal
+	getgenv, gethui, readfile, writefile, isfile, listfiles,
+	newcclosure, checkcaller, keytap, keystroke, firesignal
 } do
+
 	if type(v) ~= "function" then
 		return print("not supported.")
 	end
